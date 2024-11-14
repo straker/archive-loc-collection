@@ -1,0 +1,44 @@
+{
+  "name": "loc-collection-archival-tool",
+  "version": "1.0.0",
+  "description": "A tool to download and archive collections from the Library of Congress (LoC). Inspired by https://www.tiktok.com/@annelisethearchaeologist/video/7436133360868822318",
+  "main": "index.js",
+  "type": "module",
+  "scripts": {
+    "test": "echo \"Error: no test specified\" && exit 1",
+    "eslint": "eslint ./index.js",
+    "prettier": "prettier --write ./index.js",
+    "prepare": "husky"
+  },
+  "repository": {
+    "type": "git",
+    "url": "git+https://github.com/straker/loc-collection-archival-tool.git"
+  },
+  "author": "Steven Lambert",
+  "license": "MIT",
+  "bugs": {
+    "url": "https://github.com/straker/loc-collection-archival-tool/issues"
+  },
+  "homepage": "https://github.com/straker/loc-collection-archival-tool#readme",
+  "dependencies": {
+    "html-prettify": "^1.0.7",
+    "playwright": "^1.48.2",
+    "xlsx": "^0.18.5"
+  },
+  "devDependencies": {
+    "@eslint/eslintrc": "^3.1.0",
+    "@eslint/js": "^9.14.0",
+    "eslint": "^9.14.0",
+    "eslint-config-prettier": "^9.1.0",
+    "globals": "^15.12.0",
+    "husky": "^9.1.6",
+    "lint-staged": "^15.2.10",
+    "prettier": "^3.3.3"
+  },
+  "lint-staged": {
+    "*.js": [
+      "eslint --fix",
+      "prettier --write"
+    ]
+  }
+}

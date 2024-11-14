@@ -1,0 +1,1 @@
+Navigate to https://www.loc.gov/collections/, pick a collection, save the url, enter it
