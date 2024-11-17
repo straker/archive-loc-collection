@@ -25,6 +25,7 @@ Example archival data file:
     <th>Title</th>
     <th>Other Title</th>
     <th>Summary</th>
+    <th>Names</th>
     <th>Notes</th>
     <th>Call Number</th>
     <th>Format</th>
