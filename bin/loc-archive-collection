@@ -15,7 +15,7 @@ const __dirname = dirname(fileURLToPath(import.meta.url));
   const program = new Command();
 
   program
-    .name('loc-archive-collection')
+    .name('archive-loc-collection')
     .description(
       'A tool to download and archive collections from the Library of Congress (LoC)'
     )
@@ -32,8 +32,8 @@ const __dirname = dirname(fileURLToPath(import.meta.url));
     'after',
     `
 Examples:
-  loc-archive-collection https://www.loc.gov/collections/ansel-adams-manzanar .
-  loc-archive-collection ansel-adams-manzanar path/to/save`
+  archive-loc-collection https://www.loc.gov/collections/ansel-adams-manzanar .
+  archive-loc-collection ansel-adams-manzanar path/to/save`
   );
 
   program.parse();

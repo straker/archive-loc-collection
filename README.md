@@ -1,19 +1,19 @@
-# LoC Archive Collection
+# Archive Library of Congress (LoC) Collection
 
-A tool to download and archive collections from the Library of Congress (LoC). Inspired by https://www.tiktok.com/@annelisethearchaeologist/video/7436133360868822318
+A tool to download and archive collections from the Library of Congress (LoC). Inspired by https://www.tiktok.com/@annelisethearchaeologist/video/7436133360868822318.
 
 
 ## Installation
 
 
 ```terminal
-npm install loc-archive-collection
+npm install archive-loc-collection
 ```
 
 ## Usage
 
 ```terminal
-npx loc-archive-collection https://www.loc.gov/collections/ansel-adams-manzanar .
+npx archive-loc-collection https://www.loc.gov/collections/ansel-adams-manzanar .
 ```
 
 Navigate to https://www.loc.gov/collections/, find a collection you wish to archive, then use the tool to enter the URL and the file path to save the collection. The tool will download all media files (images, audio, video) from the collection, as well as the About page for the collection and a file containing all archival data for each media file (Title, Other Title, Summary, Names, Notes, Call Number, Format, and Filename).
