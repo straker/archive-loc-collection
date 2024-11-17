@@ -3,11 +3,21 @@
   "version": "1.0.0",
   "description": "A tool to download and archive collections from the Library of Congress (LoC). Inspired by https://www.tiktok.com/@annelisethearchaeologist/video/7436133360868822318",
   "main": "index.js",
+  "bin": {
+    "loc-archive-collection": "./bin/loc-archive-collection"
+  },
+  "engines": {
+    "node": ">=20"
+  },
+  "files": [
+    "src",
+    "bin"
+  ],
   "type": "module",
   "scripts": {
     "test": "echo \"Error: no test specified\" && exit 1",
-    "eslint": "eslint ./index.js",
-    "prettier": "prettier --write ./index.js",
+    "eslint": "eslint src/*.js bin/*",
+    "prettier": "prettier --write **/*.js",
     "prepare": "husky"
   },
   "repository": {
@@ -21,6 +31,9 @@
   },
   "homepage": "https://github.com/straker/loc-collection-archival-tool#readme",
   "dependencies": {
+    "chalk": "^5.3.0",
+    "cli-progress": "^3.12.0",
+    "commander": "^12.1.0",
     "html-prettify": "^1.0.7",
     "playwright": "^1.48.2",
     "xlsx": "^0.18.5"

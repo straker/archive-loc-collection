@@ -18,6 +18,7 @@ export default [{
     languageOptions: {
         globals: {
             ...globals.browser,
+            ...globals.node
         },
 
         ecmaVersion: "latest",
