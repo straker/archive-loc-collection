@@ -50,7 +50,7 @@ const collectionAoa = [
 ];
 const collectionErrorsAoa = [['Url', 'Error']];
 
-export async function saveCollection(collectionArg, dest) {
+export async function archiveCollection(collectionArg, dest) {
   let collectionSlug;
   try {
     const url = new URL(collectionArg);

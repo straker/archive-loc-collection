@@ -3,7 +3,7 @@ import { readFile } from 'node:fs/promises';
 import { join, dirname } from 'node:path';
 import { fileURLToPath } from 'node:url';
 import { Command } from 'commander';
-import { saveCollection } from '../src/save-collection.js';
+import { archiveCollection } from '../src/archive-collection.js';
 
 const __dirname = dirname(fileURLToPath(import.meta.url));
 
@@ -25,7 +25,7 @@ const __dirname = dirname(fileURLToPath(import.meta.url));
     .argument('<url>', 'URL or slug of the collection')
     .argument('<dest>', 'Filepath to save the collection')
     .action(async (str, dest, options) => {
-      await saveCollection(str, dest);
+      await archiveCollection(str, dest);
     });
 
   program.addHelpText(
