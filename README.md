@@ -1,4 +1,4 @@
-# LoC Collection Archival Tool
+# LoC Archive Collection
 
 A tool to download and archive collections from the Library of Congress (LoC). Inspired by https://www.tiktok.com/@annelisethearchaeologist/video/7436133360868822318
 
@@ -7,7 +7,7 @@ A tool to download and archive collections from the Library of Congress (LoC). I
 
 
 ```terminal
-npm install loc-collection-archival-tool
+npm install loc-archive-collection
 ```
 
 ## Usage
