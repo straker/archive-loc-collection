@@ -1,6 +1,7 @@
 import prettify from 'html-prettify';
 
-import { locators, getCollectionUrl, getDate } from './utils.js';
+import { getCollectionUrl, getDate } from './utils.js';
+import { locators } from './constants.js';
 
 /**
  * Get the HTML of the about collection page, if it exists.

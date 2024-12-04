@@ -1,16 +1,22 @@
 import path from 'node:path';
-import { locators, normalizeSize, download } from './utils.js';
+
+import { normalizeSize, download } from './utils.js';
+import { locators } from './constants.js';
 
 /**
  * Download a collection item.
  * @param {Page} page - Playwright Page object
  * @param {string} itemUrl - URL of the collection item
  * @param {string} collectionSlug - Slug of the collection
+ * @param {string} [sequenceName] - Name of the sequence collection
+ * @param {number} [sequenceNumber] - Index of the item in the sequence
  */
 export default async function downloadCollectionItem(
   page,
   itemUrl,
-  collectionSlug
+  collectionSlug,
+  sequenceName = '',
+  sequenceNumber
 ) {
   // find the correct format of the item and download it
   if (!(await page.locator(locators.itemFormatList).isVisible())) {
@@ -46,13 +52,16 @@ export default async function downloadCollectionItem(
   // find largest file of matching type to download
   let itemDownloadUrl = '';
   let largestSize = 0;
-  const downloadOptions = await page
-    .locator(locators.itemDownloads)
-    .all();
+  const locator = sequenceName
+    ? locators.itemSequenceDownloads
+    : locators.itemDownloads;
+  const downloadOptions = await page.locator(locator).all();
+
   for (const option of downloadOptions) {
     const type = (
       await option.getAttribute('data-file-download')
     ).toLowerCase();
+
     if (fileTypes.includes(type)) {
       const url = await option.getAttribute('value');
       const size = await option.innerText();
@@ -65,7 +74,6 @@ export default async function downloadCollectionItem(
     }
   }
 
-  console.log({ format, fileTypes, collectionSlug, itemDownloadUrl });
   if (!itemDownloadUrl) {
     throw new Error(
       `Unable to find suitable downloadable file with "${format}" format`
@@ -73,12 +81,14 @@ export default async function downloadCollectionItem(
   }
 
   // save file
-  const fileName = path.basename(itemDownloadUrl);
-  await download(
-    itemDownloadUrl,
-    path.join(collectionSlug, fileName)
-  );
+  const extension = path.extname(itemDownloadUrl);
+  const basename = path.basename(itemDownloadUrl, extension);
+  const fileName =
+    (sequenceNumber
+      ? `${sequenceName}-${sequenceNumber}`
+      : basename) + extension;
+  const filepath = path.join(collectionSlug, sequenceName, fileName);
+  await download(itemDownloadUrl, filepath);
 
-  console.log({ format, fileName });
   return { format, fileName };
 }

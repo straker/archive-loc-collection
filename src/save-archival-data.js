@@ -5,11 +5,13 @@ import chalk from 'chalk';
 
 /**
  * Save the archival data to a spreadsheet.
+ * @param {string} dest - Filepath to save the collection
  * @param {string} collectionSlug - Slug of the collection
  * @param {string[][]} collectionAoa - List of collection data
  * @param {string[][]} collectionErrorsAoa - List of URLs and errors
  */
 export default function saveArchivalData(
+  dest,
   collectionSlug,
   collectionAoa,
   collectionErrorsAoa
@@ -25,11 +27,10 @@ export default function saveArchivalData(
 
   if (collectionErrorsAoa.length > 1) {
     console.log(
-      chalk.red('Some collection items could not be archived:')
+      chalk.red(
+        'Some collection items could not be archived.\nSee the Errors sheet in the spreadsheet for more details.'
+      )
     );
-    collectionErrorsAoa[0]
-      .slice(1)
-      .map(([url, err]) => console.log(chalk.red(`${url}:`, err)));
 
     const errorWorksheet = XLSX.utils.aoa_to_sheet(
       collectionErrorsAoa
@@ -39,6 +40,6 @@ export default function saveArchivalData(
 
   XLSX.writeFile(
     workbook,
-    path.join(collectionSlug, `${collectionSlug}.xlsx`)
+    path.join(dest, collectionSlug, `${collectionSlug}.xlsx`)
   );
 }

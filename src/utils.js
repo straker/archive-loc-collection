@@ -10,26 +10,6 @@ const locUrl = new URL(locBasePath);
 // e.g. (24.1 MB) or (300x300 px)
 const fileSizeRegex = /\((?<size>[\d.x]+)\s*(?<type>\w+)\)/;
 
-// CSS selectors used for page.locator
-export const locators = {
-  aboutArticle: '#article',
-  collectionName: '#page-title h1 span',
-  collectionResults: '#results li div.description a',
-  itemDownloads: '#select-resource0 option',
-  itemSequenceDownload: '#download option',
-  itemFormatList: '#item-online_format + ul',
-  itemFormats: '#item-online_format + ul li',
-  itemCallNumber: '#item-call_number + ul',
-  itemManifest: '#item-iiif-presentation-manifest + ul a',
-  itemNameList: '#item-contributor_names + ul',
-  itemNames: '#item-contributor_names + ul li',
-  itemNoteList: '#item-notes + ul',
-  itemNotes: '#item-notes + ul li',
-  itemOtherTitle: '#item-other_title + ul',
-  itemSummary: '#item-summary + ul',
-  itemTitle: '#item-title + ul'
-};
-
 /**
  * Download a file to the specified filepath.
  * @param {string} url - URL of the file to download

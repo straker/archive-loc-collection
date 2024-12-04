@@ -1,4 +1,5 @@
-import { locators, getCollectionUrl } from './utils.js';
+import { getCollectionUrl } from './utils.js';
+import { locators } from './constants.js';
 
 /**
  * Get a list of all collection item urls.
