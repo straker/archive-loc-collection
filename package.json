@@ -1,6 +1,6 @@
 {
   "name": "archive-loc-collection",
-  "version": "1.0.0",
+  "version": "1.1.0",
   "description": "A tool to download and archive collections from the Library of Congress (LoC). Inspired by https://www.tiktok.com/@annelisethearchaeologist/video/7436133360868822318",
   "main": "index.js",
   "bin": {
