@@ -10,7 +10,7 @@ import saveArchivalData from './save-archival-data.js';
 import getCollectionItemUrls from './get-collection-item-urls.js';
 import getItemArchivalData from './get-item-archival-data.js';
 import getAboutPage from './get-about-page.js';
-import { getCollectionUrl } from './utils.js';
+import { getCollectionUrl, getLocatorInnerText } from './utils.js';
 import { locators } from './constants.js';
 
 const collectionAoa = [
@@ -41,7 +41,10 @@ export async function archiveCollection(collectionArg, dest) {
     collectionSlug = collectionArg;
   }
 
-  const { collectionUrl } = getCollectionUrl(collectionSlug);
+  const { collectionUrl, pageUrl } = getCollectionUrl(
+    collectionSlug,
+    { search: 'st=list' }
+  );
   const browser = await playwright.chromium.launch({
     headless: true
   });
@@ -50,10 +53,20 @@ export async function archiveCollection(collectionArg, dest) {
     const context = await browser.newContext();
     const page = await context.newPage();
 
-    const response = await page.goto(collectionUrl);
+    console.log('Navigating to collection url');
+
+    const response = await page.goto(pageUrl);
     if (!response.ok()) {
       throw new Error(`Unable to access collection ${collectionUrl}`);
     }
+
+    const paginationSummary = await getLocatorInnerText(
+      page,
+      locators.paginationSummary
+    );
+    const numItems = parseInt(
+      paginationSummary.trim().split(' ').pop().replaceAll(',', '')
+    );
 
     await mkdir(path.join(dest, collectionSlug), { recursive: true });
     const collectionName = await page
@@ -68,7 +81,7 @@ export async function archiveCollection(collectionArg, dest) {
       collectionName
     );
     await writeFile(
-      path.join(collectionSlug, 'about.md'),
+      path.join(dest, collectionSlug, 'about.md'),
       aboutPage,
       'utf8'
     );
@@ -82,9 +95,13 @@ export async function archiveCollection(collectionArg, dest) {
       },
       cliProgress.Presets.shades_grey
     );
+
+    console.log('Gathering collection item urls');
+
     const itemUrls = await getCollectionItemUrls(
       page,
-      collectionSlug
+      collectionSlug,
+      numItems
     );
     const progressTotal = itemUrls.length;
     const progressBar = multibar.create(progressTotal, 0, {
@@ -123,18 +140,32 @@ export async function archiveCollection(collectionArg, dest) {
           const manifestLink = await page.locator(
             locators.itemManifest
           );
+          const mainfestVisible = await manifestLink.isVisible();
+          const previewLinkText = await getLocatorInnerText(
+            page,
+            locators.itemPreview
+          );
 
           // single item
-          if (!(await manifestLink.isVisible())) {
+          const isSequence =
+            mainfestVisible ||
+            previewLinkText.includes('images in sequence');
+          // console.log({isSequence})
+
+          if (!isSequence) {
+            // console.log('single item', isSequence);
             const data = await getItemArchivalData(
               page,
               itemUrl,
+              dest,
               collectionSlug
             );
             collectionAoa.push(data);
+            break;
           }
           // sequence of items
-          else {
+          else if (mainfestVisible) {
+            // console.log('manifest');
             const url = await manifestLink.getAttribute('href');
             const sequenceName = path.basename(itemUrl);
             await mkdir(
@@ -164,9 +195,67 @@ export async function archiveCollection(collectionArg, dest) {
                 const data = await getItemArchivalData(
                   page,
                   sequenceItemUrl,
+                  dest,
                   collectionSlug,
                   sequenceName,
                   i + 1
+                );
+                collectionAoa.push(data);
+                sequenceBar.increment();
+                await setTimeout(1000);
+              } catch (err) {
+                collectionErrorsAoa.push([
+                  sequenceItemUrl,
+                  err.message
+                ]);
+              }
+            }
+
+            sequenceBar.stop();
+            multibar.remove(sequenceBar);
+          }
+          // sequence with no manifest
+          else {
+            // console.log('sequence of images')
+            const previewLink = await page.locator(
+              locators.itemPreview
+            );
+            const url = await previewLink.getAttribute('href');
+            const sequenceName = path.basename(itemUrl);
+            const sequenceUrl = new URL(url);
+            await mkdir(
+              path.join(dest, collectionSlug, sequenceName),
+              { recursive: true }
+            );
+
+            const length = parseInt(previewLinkText.match(/\d+/)[0]);
+            // console.log({ length })
+
+            const sequenceBar = multibar.create(length, 0, {
+              filename: `sequence: ${sequenceName}`
+            });
+
+            for (let i = 1; i <= length; i++) {
+              sequenceUrl.search = `sp=${i}`;
+              const sequenceItemUrl = sequenceUrl.href;
+
+              // console.log({ sequenceItemUrl })
+
+              await page.goto(sequenceItemUrl);
+              try {
+                if (!response.ok()) {
+                  throw new Error(
+                    `Unable to navigate to sequence item ${sequenceItemUrl}`
+                  );
+                }
+
+                const data = await getItemArchivalData(
+                  page,
+                  sequenceItemUrl,
+                  dest,
+                  collectionSlug,
+                  sequenceName,
+                  i
                 );
                 collectionAoa.push(data);
                 sequenceBar.increment();

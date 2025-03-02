@@ -13,6 +13,7 @@ import { locators } from './constants.js';
 export default async function getItemArchivalData(
   page,
   itemUrl,
+  dest,
   collectionSlug,
   sequenceName,
   sequenceNumber
@@ -50,6 +51,7 @@ export default async function getItemArchivalData(
   const { format, fileName } = await downloadCollectionItem(
     page,
     itemUrl,
+    dest,
     collectionSlug,
     sequenceName,
     sequenceNumber
