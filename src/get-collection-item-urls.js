@@ -1,5 +1,7 @@
 import { setTimeout } from 'node:timers/promises';
 
+import cliProgress from 'cli-progress';
+
 import { getCollectionUrl } from './utils.js';
 import { locators } from './constants.js';
 
@@ -19,33 +21,47 @@ export default async function getCollectionItemUrls(
 ) {
   const items = [];
   const numPages = Math.ceil(numItems / itemsPerPage);
+  const bar = new cliProgress.SingleBar(
+    {
+      clearOnComplete: true,
+      hideCursor: false,
+      format: '{bar} | {percentage}% | ETA: {eta}s'
+    },
+    cliProgress.Presets.shades_classic
+  );
 
-  console.log({ numItems, numPages });
+  console.log('Gathering collection item URLs...');
+  bar.start(numPages, 0);
 
-  for (let i = 1; i <= numPages; i++) {
-    const { pageUrl } = getCollectionUrl(collectionSlug, {
-      search: `st=list&sp=${i}&c=${itemsPerPage}`
-    });
-    console.log('navigate', pageUrl);
-    const response = await page.goto(pageUrl);
-    if (!response.ok()) {
-      throw new Error(
-        `Unable to navigate to collection results page ${pageUrl}`
-      );
-    }
+  try {
+    for (let i = 1; i <= numPages; i++) {
+      const { pageUrl } = getCollectionUrl(collectionSlug, {
+        search: `st=list&sp=${i}&c=${itemsPerPage}`
+      });
 
-    const collectionItems = await page
-      .locator(locators.collectionResults)
-      .all();
-    for (const item of collectionItems) {
-      const url = await item.getAttribute('href');
-      // some items in the collection are not items we should save
-      // (web pages, the collection itself, articles, etc.)
-      if (url.includes('loc.gov/item')) {
-        items.push(url);
+      const response = await page.goto(pageUrl);
+      if (!response.ok()) {
+        throw new Error(
+          `Unable to navigate to collection results page ${pageUrl}`
+        );
       }
+
+      const collectionItems = await page
+        .locator(locators.collectionResults)
+        .all();
+      for (const item of collectionItems) {
+        const url = await item.getAttribute('href');
+        // some items in the collection are not items we should save
+        // (web pages, the collection itself, articles, etc.)
+        if (url.includes('loc.gov/item')) {
+          items.push(url);
+        }
+      }
+      bar.increment();
+      await setTimeout(1000);
     }
-    await setTimeout(1000);
+  } finally {
+    bar.stop();
   }
 
   return items;

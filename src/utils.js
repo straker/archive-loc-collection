@@ -39,7 +39,7 @@ export function getDate() {
  * @param {string} selector - CSS selector of the element
  */
 export async function getLocatorInnerText(page, selector) {
-  const locator = await page.locator(selector);
+  const locator = await page.locator(selector).first();
   if (await locator.isVisible()) {
     return await locator.innerText();
   }
