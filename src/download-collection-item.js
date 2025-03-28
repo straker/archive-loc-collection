@@ -19,8 +19,6 @@ export default async function downloadCollectionItem(
   sequenceName = '',
   sequenceNumber
 ) {
-  // console.log({itemUrl, dest, collectionSlug});
-
   // find the correct format of the item and download it
   if (!(await page.locator(locators.itemFormatList).isVisible())) {
     throw new Error(`Unable to determine format`);
@@ -91,9 +89,6 @@ export default async function downloadCollectionItem(
   }
 
   const itemDownloadUrl = options[0].url;
-
-  // console.log('download');
-  // console.log({ format, itemDownloadUrl })
 
   // save file
   const extension = path.extname(itemDownloadUrl);

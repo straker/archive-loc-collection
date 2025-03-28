@@ -64,8 +64,6 @@ export default async function archiveCollectionItems(
     // TODO: should be able to stop in the middle of a download and then
     // pick back up where it left off (instead of starting from the beginning)
     for (const itemUrl of itemUrls) {
-      // console.log('next item');
-
       try {
         const response = await page.goto(itemUrl);
         if (!response.ok()) {
@@ -88,7 +86,6 @@ export default async function archiveCollectionItems(
             collectionSlug
           );
           collectionAoa.push(data);
-          // console.log('success');
         }
         // sequence of items
         else {
@@ -145,11 +142,9 @@ export default async function archiveCollectionItems(
           multibar.remove(sequenceBar);
         }
       } catch (err) {
-        // console.log('error');
         collectionErrorsAoa.push([itemUrl, err.message]);
       }
 
-      // console.log('increment');
       progressBar.increment();
       await setTimeout(1000);
     }
