@@ -14,6 +14,7 @@ import { locators } from './constants.js';
 export default async function downloadCollectionItem(
   page,
   itemUrl,
+  dest,
   collectionSlug,
   sequenceName = '',
   sequenceNumber
@@ -26,7 +27,7 @@ export default async function downloadCollectionItem(
   const itemFormats = await page.locator(locators.itemFormats).all();
   for (const itemFormat of itemFormats) {
     const formatType = await itemFormat.innerText();
-    if (['image', 'audio', 'video'].includes(formatType)) {
+    if (['image', 'audio', 'video', 'pdf'].includes(formatType)) {
       hasFormats.push(formatType);
     }
   }
@@ -46,39 +47,48 @@ export default async function downloadCollectionItem(
     fileTypes.push('audio');
   } else {
     format = 'image';
-    fileTypes.push('jpeg');
+    // prefer tiff for archival quality images over jpeg
+    fileTypes.push('tiff', 'jpeg');
   }
 
-  // find largest file of matching type to download
-  let itemDownloadUrl = '';
-  let largestSize = 0;
   const locator = sequenceName
     ? locators.itemSequenceDownloads
     : locators.itemDownloads;
   const downloadOptions = await page.locator(locator).all();
 
+  let options = [];
   for (const option of downloadOptions) {
     const type = (
       await option.getAttribute('data-file-download')
     ).toLowerCase();
+    const url = await option.getAttribute('value');
+    const size = await option.innerText();
+    const normalizedSize = normalizeSize(size);
 
-    if (fileTypes.includes(type)) {
-      const url = await option.getAttribute('value');
-      const size = await option.innerText();
-      const normalizedSize = normalizeSize(size);
-
-      if (normalizedSize > largestSize) {
-        largestSize = normalizedSize;
-        itemDownloadUrl = url;
-      }
-    }
+    options.push({
+      type,
+      url,
+      size: normalizedSize
+    });
   }
 
-  if (!itemDownloadUrl) {
+  options = options
+    .filter(({ type }) => fileTypes.includes(type))
+    // sort by preferred type, then by largest size
+    .sort((a, b) => {
+      return (
+        fileTypes.indexOf(a.type) - fileTypes.indexOf(b.type) ||
+        b.size - a.size
+      );
+    });
+
+  if (!options.length) {
     throw new Error(
       `Unable to find suitable downloadable file with "${format}" format`
     );
   }
+
+  const itemDownloadUrl = options[0].url;
 
   // save file
   const extension = path.extname(itemDownloadUrl);
@@ -87,7 +97,12 @@ export default async function downloadCollectionItem(
     (sequenceNumber
       ? `${sequenceName}-${sequenceNumber}`
       : basename) + extension;
-  const filepath = path.join(collectionSlug, sequenceName, fileName);
+  const filepath = path.join(
+    dest,
+    collectionSlug,
+    sequenceName,
+    fileName
+  );
   await download(itemDownloadUrl, filepath);
 
   return { format, fileName };

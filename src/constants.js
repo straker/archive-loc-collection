@@ -14,6 +14,8 @@ export const locators = {
   itemNoteList: '#item-notes + ul',
   itemNotes: '#item-notes + ul li',
   itemOtherTitle: '#item-other_title + ul',
+  itemPreview: '.preview a.link-resource',
   itemSummary: '#item-summary + ul',
-  itemTitle: '#item-title + ul'
+  itemTitle: '#item-title + ul',
+  paginationSummary: '#pagination-summary'
 };

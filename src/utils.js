@@ -39,7 +39,7 @@ export function getDate() {
  * @param {string} selector - CSS selector of the element
  */
 export async function getLocatorInnerText(page, selector) {
-  const locator = await page.locator(selector);
+  const locator = await page.locator(selector).first();
   if (await locator.isVisible()) {
     return await locator.innerText();
   }
@@ -52,7 +52,14 @@ export async function getLocatorInnerText(page, selector) {
  * @param {string} sizeText - The size and type
  */
 export function normalizeSize(sizeText) {
-  let { size, type } = sizeText.match(fileSizeRegex).groups;
+  const match = sizeText.match(fileSizeRegex);
+
+  // size is not part of the text (probably an item that says "complete")
+  if (!match) {
+    return 0;
+  }
+
+  let { size, type } = match.groups;
   type = type.toLowerCase();
 
   if (type === 'kb') {
